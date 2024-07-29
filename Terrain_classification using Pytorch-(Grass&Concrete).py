@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
 
 import os
 import pandas as pd
@@ -30,9 +26,6 @@ import matplotlib as mpl
 from sklearn.metrics import accuracy_score
 
 
-# In[2]:
-
-
 dataset='C:/Users/Engem/Downloads/data/GroundType/'
 
 ID=[]
@@ -55,48 +48,24 @@ for i in range(len(label)):
         ClassID.append(1)
 
 
-# In[3]:
 
 
 dset=pd.DataFrame()
 dset['ID']=ID
 dset['label']=label
 dset['ClassID']=ClassID
-
-
-# In[4]:
-
-
 dset.head(150)
 
 
-# In[5]:
-
 
 dset.to_csv('C:/Users/Engem/Downloads/data/data_binary.csv')
-
-
-# In[6]:
-
-
 df = pd.read_csv('C:/Users/Engem/Downloads/data/data_binary.csv')
-
-
-# In[7]:
-
-
 df['ID'].loc[150]
-
-
-# In[8]:
-
 
 Grass = 'C:/Users/Engem/Downloads/data/GroundType/Grass/'
 path=os.path.join(Grass, df['ID'].loc[95])
 print(path)
 
-
-# In[9]:
 
 
 def plot_audio(filename):
@@ -117,9 +86,6 @@ def plot_audio(filename):
 aud= plot_audio(path)
 print(aud)
 
-
-
-# In[10]:
 
 
 def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
@@ -160,8 +126,6 @@ def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
 spectro_gram(aud)
 
 
-# In[11]:
-
 
 plt.figure(figsize=(8,6),dpi=80)
 sn.set_theme(style="darkgrid")
@@ -181,19 +145,12 @@ print(dset.label.unique())
 
 print("Number of training examples=", dset.shape[0], "  Number of classes=", len(dset.label.unique()))
 
-
-# In[14]:
-
-
 # Read file
 
 df['ID'] = df['label'].astype(str) + '/' + df['ID'].astype(str)
 # Take relevant columns
 df = df[['ID', 'ClassID']]
 df.head(150)
-
-
-# In[15]:
 
 
 class AudioUtil():
@@ -275,10 +232,6 @@ class AudioUtil():
     #def play_audio(waveform, sample_rate):
         #display(Audio(waveform[0], rate=sample_rate))
         
-        
-
-
-# In[16]:
 
 
 #dataset=[]
@@ -323,14 +276,9 @@ class SoundDS(Dataset):
       return  sgram_features, class_id
 
 
-# In[17]:
-
 
 myds = SoundDS(df, dataset)
 print(myds[20])
-
-
-# In[18]:
 
 
 # data loader
@@ -355,8 +303,6 @@ print(len(test_loader))
    #print(i, batch)
 
 
-# In[19]:
-
 
 examples = next(iter(train_loader))
 data, targets= examples
@@ -370,8 +316,6 @@ print(data.shape, targets.shape)
 #print(example_data.shape, example_targets.shape)
 #print(' '.join(f'{classes[example_targets[j]]:5s}' for j in range(batch_size)))
 
-
-# In[20]:
 
 
 class AudioClassifier(nn.Module):
@@ -407,10 +351,6 @@ class AudioClassifier(nn.Module):
         x = self.fc2(x)
         x= torch.sigmoid(x)
         return x            # Final output
-
-
-
-# In[21]:
 
 
 #TRAINING THE NETWORK
@@ -460,7 +400,6 @@ def train(model, train_loader, optimizer,scheduler):
         train_losses.append(train_loss)
 
 
-# In[22]:
 
 
 #TESTING THE MODE
@@ -513,8 +452,6 @@ def test(model, test_loader):
         plt.show()
 
 
-# In[23]:
-
 
 model = AudioClassifier()
 criterion = nn.BCELoss()
@@ -525,14 +462,7 @@ scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.001,
                                                 anneal_strategy='linear')
 
 
-# In[24]:
-
-
 summary(model, (1, 64, 376))
-
-
-# In[25]:
-
 
 test_accu = []
 train_accu= []
@@ -543,9 +473,6 @@ for epoch in range(num_epochs):
         test(model,test_loader)
 
 
-# In[26]:
-
-
 plt.plot(train_accu)
 plt.plot(test_accu)
 plt.xlabel('epoch')
@@ -554,11 +481,6 @@ plt.legend(['Train','test'])
 plt.title('Train vs test Accuracy')
 
 plt.show()
-
-
-# In[27]:
-
-
 plt.plot(train_losses)
 plt.plot(test_losses)
 plt.xlabel('epoch')
@@ -567,10 +489,6 @@ plt.legend(['Train','test'])
 plt.title('Train vs test loss')
 
 plt.show()
-
-
-# In[28]:
-
 
 # predict one of the data 
 
@@ -586,9 +504,6 @@ def predict(model,inputs,labels):
   
 prediction,label=predict(model,waveform,label)
 print(prediction,label)
-
-
-# In[29]:
 
 
 test_accuarcy = 0.0
@@ -609,8 +524,6 @@ for samples, labels in test_loader:
         #print('test_accuarcy',test_accuarcy)
 print('Accuracy of the network on {} test images: {}%'.format(len(val_ds), round(test_accuarcy.item()*100.0/len(test_loader), 2)))
 
-
-# In[30]:
 
 
 # prepare to count predictions for each class
