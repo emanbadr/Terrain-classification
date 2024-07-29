@@ -1,9 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import os
 import pandas as pd
 import numpy as np
@@ -26,9 +21,6 @@ from sklearn.manifold import TSNE
 from torchsummary import summary
 from matplotlib import cm
 import matplotlib as mpl
-
-
-# In[2]:
 
 
 dataset='C:/Users/Engem/Downloads/data/GroundType1/'
@@ -55,48 +47,24 @@ for i in range(len(label)):
         ClassID.append(2)
 
 
-# In[3]:
-
 
 dset=pd.DataFrame()
 dset['ID']=ID
 dset['label']=label
 dset['ClassID']=ClassID
 
-
-# In[4]:
-
-
 dset.head(599)
-
-
-# In[5]:
-
 
 dset.to_csv('C:/Users/Engem/Downloads/data/data.csv')
 
-
-# In[6]:
-
-
 df = pd.read_csv('C:/Users/Engem/Downloads/data/data.csv')
 
-
-# In[7]:
-
-
 df['ID'].loc[150]
-
-
-# In[8]:
 
 
 Grass = 'C:/Users/Engem/Downloads/data/GroundType1/Grass/'
 path=os.path.join(Grass, df['ID'].loc[595])
 print(path)
-
-
-# In[9]:
 
 
 def plot_audio(filename):
@@ -118,8 +86,6 @@ def plot_audio(filename):
 aud= plot_audio(path)
 print(aud)
 
-
-# In[10]:
 
 
 def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
@@ -160,29 +126,14 @@ def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
 spectro_gram(aud)
 
 
-# In[11]:
-
-
 plt.figure(figsize=(8,6),dpi=80)
 sn.set_theme(style="darkgrid")
 sn.countplot(x ='label',data=dset)
 plt.title('counts: \n' +'Concrete:'+str(dset.label.value_counts()[0])+'\n Flatmountain:'+str(dset.label.value_counts()[1])+'\n Grass:'+str(dset.label.value_counts()[2]))
 plt.show()
-
-
-# In[12]:
-
-
 print(dset.label.unique())
-
-
-# In[13]:
-
-
 print("Number of training examples=", dset.shape[0], "  Number of classes=", len(dset.label.unique()))
 
-
-# In[14]:
 
 
 # Read file
@@ -192,8 +143,6 @@ df['ID'] = df['label'].astype(str) + '/' + df['ID'].astype(str)
 df = df[['ID', 'ClassID']]
 df.head(350)
 
-
-# In[15]:
 
 
 class AudioUtil():
@@ -278,9 +227,6 @@ class AudioUtil():
         
 
 
-# In[16]:
-
-
 #dataset=[]
 # ----------------------------
 # Sound Dataset
@@ -325,15 +271,9 @@ class SoundDS(Dataset):
       return  sgram_features, class_id
 
 
-# In[17]:
-
 
 myds = SoundDS(df, dataset)
 print(myds[20])
-
-
-# In[18]:
-
 
 # data loader
 
@@ -357,8 +297,6 @@ print(len(test_loader))
    #print(i, batch)
 
 
-# In[19]:
-
 
 examples = next(iter(train_loader))
 data, targets= examples
@@ -372,8 +310,6 @@ print(data.shape, targets.shape)
 #print(example_data.shape, example_targets.shape)
 #print(' '.join(f'{classes[example_targets[j]]:5s}' for j in range(batch_size)))
 
-
-# In[20]:
 
 
 # Audio Classification Model, Build the model architecture
@@ -416,9 +352,6 @@ class AudioClassifier(nn.Module):
         x = self.fc2(x)
         return x            # Final output
 
-
-
-# In[21]:
 
 
 #TRAINING THE NETWORK
@@ -475,10 +408,6 @@ def train(model, train_loader, optimizer,scheduler):
         
         print('Finished Training') 
         
-  
-
-
-# In[22]:
 
 
 #TESTING THE MODE
@@ -537,10 +466,6 @@ def test(model, test_loader):
         
 
 
-
-# In[23]:
-
-
 # Define the loss function and optimizer
 
 model = AudioClassifier()
@@ -552,13 +477,9 @@ scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.001,
                                                 anneal_strategy='linear')
 
 
-# In[24]:
-
 
 summary(model, (1, 64, 376))
 
-
-# In[25]:
 
 
 test_accu = []
@@ -569,8 +490,6 @@ for epoch in range(num_epochs):
     train(model,train_loader,optimizer,scheduler)
     test(model,test_loader)
 
-
-# In[26]:
 
 
 plt.plot(train_accu)
@@ -583,8 +502,6 @@ plt.title('Train vs test Accuracy')
 plt.show()
 
 
-# In[27]:
-
 
 plt.plot(train_losses)
 plt.plot(test_losses)
@@ -595,8 +512,6 @@ plt.title('Train vs test loss')
 
 plt.show()
 
-
-# In[28]:
 
 
 test_accuarcy = 0.0
@@ -612,8 +527,6 @@ for samples, labels in test_loader:
         test_accuarcy += torch.mean(correct.float())
 print('Accuracy of the network on {} test images: {}%'.format(len(val_ds), round(test_accuarcy.item()*100.0/len(test_loader), 2)))
 
-
-# In[29]:
 
 
 # prepare to count predictions for each class
@@ -643,8 +556,6 @@ for classname, correct_count in correct_pred.items():
     accuracy = 100 * float(correct_count) / total_pred[classname]
     print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
 
-
-# In[30]:
 
 
 #visualize the ouput layer for the test data 
@@ -701,8 +612,6 @@ for epoch in range(num_epochs):
     test2(model,test_loader)
 
 
-# In[31]:
-
 
 # Visualize feature maps
 activation = {}
@@ -730,9 +639,6 @@ for idx in range(act.size(0)//8):
     for idy in range(act.size(0)//8):
         axarr[idx, idy].imshow(act[k])
         k += 1
-
-
-# In[ ]:
 
 
 
