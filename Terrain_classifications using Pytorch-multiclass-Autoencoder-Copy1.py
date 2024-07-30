@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
 
 import os
 import pandas as pd
@@ -30,9 +26,6 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 
 
-# In[2]:
-
-
 dataset='C:/Users/Engem/Downloads/data/GroundType1/'
 
 ID=[]
@@ -57,55 +50,25 @@ for i in range(len(label)):
         ClassID.append(2)
 
 
-# In[3]:
-
-
 dset=pd.DataFrame()
 dset['ID']=ID
 dset['label']=label
 dset['ClassID']=ClassID
 
 
-# In[4]:
-
-
 dset.head(599)
-
-
-# In[5]:
-
 
 dset.to_csv('C:/Users/Engem/Downloads/data/data.csv')
 
-
-# In[6]:
-
-
 df = pd.read_csv('C:/Users/Engem/Downloads/data/data.csv')
-
-
-# In[7]:
-
 
 df['ID'].loc[150]
 
-
-# In[8]:
-
-
 df['ID']
-
-
-# In[9]:
-
 
 Grass = 'C:/Users/Engem/Downloads/data/GroundType1/Grass/'
 path=os.path.join(Grass, df['ID'].loc[595])
 print(path)
-
-
-# In[10]:
-
 
 def plot_audio(filename):
     waveform, sample_rate = torchaudio.load(filename)
@@ -125,10 +88,6 @@ def plot_audio(filename):
 
 aud= plot_audio(path)
 print(aud)
-
-
-# In[11]:
-
 
 def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
     sig, sr = aud
@@ -167,31 +126,15 @@ def spectro_gram(aud, n_mels=64, n_fft=1024, hop_len=None):
 
 spectro_gram(aud)
 
-
-# In[12]:
-
-
 plt.figure(figsize=(8,6),dpi=80)
 sn.set_theme(style="darkgrid")
 sn.countplot(x ='label',data=dset)
 plt.title('counts: \n' +'Concrete:'+str(dset.label.value_counts()[0])+'\n Flatmountain:'+str(dset.label.value_counts()[1])+'\n Grass:'+str(dset.label.value_counts()[2]))
 plt.show()
 
-
-# In[13]:
-
-
 print(dset.label.unique())
 
-
-# In[14]:
-
-
 print("Number of training examples=", dset.shape[0], "  Number of classes=", len(dset.label.unique()))
-
-
-# In[15]:
-
 
 # Read file
 
@@ -199,9 +142,6 @@ df['ID'] = df['label'].astype(str) + '/' + df['ID'].astype(str)
 # Take relevant columns
 df = df[['ID', 'ClassID']]
 df.head(350)
-
-
-# In[16]:
 
 
 class AudioUtil():
@@ -283,11 +223,7 @@ class AudioUtil():
         #def play_audio(waveform, sample_rate):
         #display(Audio(waveform[0], rate=sample_rate))
         
-        
-
-
-# In[17]:
-
+    
 
 #dataset=[]
 # ----------------------------
@@ -335,16 +271,9 @@ class SoundDS(Dataset):
       return  sgram_features,  class_id
 
 
-# In[18]:
-
-
 myds = SoundDS(df, dataset)
 
 print(myds[20])
-
-
-# In[19]:
-
 
 # data loader
 
@@ -368,9 +297,6 @@ print(len(test_loader))
    #print(i, batch)
 
 
-# In[20]:
-
-
 examples = next(iter(train_loader))
 data, targets= examples
 print(data.shape, targets.shape)
@@ -384,9 +310,6 @@ print(example_data.shape, example_targets.shape)
 #print(' '.join(f'{classes[example_targets[j]]:5s}' for j in range(batch_size)))
 
 
-# In[21]:
-
-
 #Utility functions to un-normalize and display an image
 def imshow(img):
     img = img / 2 + 0.5  
@@ -395,9 +318,6 @@ def imshow(img):
  
 #Define the image classes
 classes = ['concrete', 'flat', 'grass']
-
-
-# In[22]:
 
 
 #Obtain one batch of training images
@@ -414,17 +334,12 @@ for idx in np.arange(9):
     ax.set_title(classes[labels[idx]])
 
 
-# In[23]:
-
 
 data2 = data[0].reshape(len(data[0]),-1)
 
 print(data[0].shape)
 print(data2)
 print(data2.shape)
-
-
-# In[24]:
 
 
 conv1= nn.Conv2d(1, 8, kernel_size=3, stride=2, padding=1)
@@ -440,9 +355,6 @@ print(x.shape)
 print(x1.shape)
 print(x2.shape)
 print(x3.shape)
-
-
-# In[25]:
 
 
 class Encoder(nn.Module):
@@ -475,10 +387,6 @@ class Encoder(nn.Module):
         x = self.encoder_lin(x)
         return x
 
-
-# In[26]:
-
-
 class Decoder(nn.Module):
     
     def __init__(self, encoded_space_dim, fc2_input_dim):
@@ -510,9 +418,6 @@ class Decoder(nn.Module):
         x = self.decoder_conv(x)
         x = torch.sigmoid(x)
         return x
-
-
-# In[27]:
 
 
 #Loss function
@@ -548,9 +453,6 @@ encoder.to(device)
 decoder.to(device)
 
 
-# In[28]:
-
-
 ### Training function
 def train_epoch(encoder, decoder, device, data2, loss_fn, optimizer):
     # Set train mode for both the encoder and the decoder
@@ -565,7 +467,7 @@ def train_epoch(encoder, decoder, device, data2, loss_fn, optimizer):
         # Decode data
         decoded_data = decoder(encoded_data)
         # Evaluate loss
-        loss = loss_fn(decoded_data.reshape(-1, decoded_data.shape[-1]), image_batch.reshape(-1))
+        loss = loss_fn(decoded_data, image_batch)
         # Backward pass
         optimizer.zero_grad()
         loss.backward()
@@ -575,9 +477,6 @@ def train_epoch(encoder, decoder, device, data2, loss_fn, optimizer):
         train_loss.append(loss.detach().cpu().numpy())
 
     return np.mean(train_loss)
-
-
-# In[29]:
 
 
 ### Testing function
@@ -610,21 +509,14 @@ def test_epoch(encoder, decoder, device, test_loader, loss_fn):
     return val_loss
 
 
-# In[30]:
-
-
 data= train_loader.dataset[89][0]
 print(data)
 
-
-# In[31]:
 
 
 data, targets = train_loader.dataset[89]
 print(targets)
 
-
-# In[32]:
 
 
 def plot_ae_outputs(encoder,decoder,n=4):
@@ -658,10 +550,6 @@ def plot_ae_outputs(encoder,decoder,n=4):
       ax.set_title(classes[targets])
     plt.show()  
 
-
-# In[33]:
-
-
 num_epochs = 40
 diz_loss = {'train_loss':[],'val_loss':[]}
 for epoch in range(num_epochs):
@@ -674,13 +562,7 @@ for epoch in range(num_epochs):
    plot_ae_outputs(encoder,decoder,n=4)
 
 
-# In[ ]:
-
-
 test_epoch(encoder,decoder,device,test_loader,loss_fn).item()
-
-
-# In[ ]:
 
 
 from tqdm import tqdm
@@ -708,16 +590,11 @@ encoded_samples
 #list(encoded_samples.values[0])
 
 
-# In[ ]:
-
-
 import plotly.express as px
 
 px.scatter(encoded_samples, x='Enc. Variable 0', y='Enc. Variable 1', 
            color=encoded_samples.label.astype(str), opacity=0.7)
 
-
-# In[ ]:
 
 
 from sklearn.manifold import TSNE
@@ -729,8 +606,6 @@ fig = px.scatter(tsne_results, x=0, y=1,
                  labels={'0': 'tsne-2d-one', '1': 'tsne-2d-two'})
 fig.show()
 
-
-# In[ ]:
 
 
 
